@@ -1,13 +1,438 @@
-<!-- index.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的静态网站123123</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>活动快报</title>
+    <style>
+        :root {
+            --bg: #f7f8fa;
+            --card-bg: #ffffff;
+            --text-main: #2f3542;
+            --text-sub: #747d8c;
+            --border-radius: 12px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --nav-height: 60px;
+            /* 默认兜底颜色 */
+            --default-color: #57606f; 
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            color: var(--text-main);
+            padding-bottom: 40px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* === 顶部导航 === */
+        .top-nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            height: var(--nav-height);
+            display: flex;
+            align-items: center;
+            overflow-x: auto;
+            white-space: nowrap;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+            padding: 0 10px;
+            scrollbar-width: none; 
+        }
+        .top-nav::-webkit-scrollbar { display: none; }
+
+        .nav-item {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 14px;
+            margin: 0 4px;
+            text-decoration: none;
+            color: var(--text-sub);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            min-width: 50px;
+            cursor: pointer;
+            position: relative;
+            /* 这里的变量会由JS动态注入 */
+            --site-color: var(--default-color); 
+        }
+
+        /* 选中状态：文字变色，背景微亮 */
+        .nav-item.active {
+            color: var(--site-color);
+            background: #fff;
+            transform: translateY(-1px);
+        }
+
+        /* 选中时底部增加一个小横条 */
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+            background-color: var(--site-color);
+        }
+
+        .nav-item img {
+            width: 22px;
+            height: 22px;
+            margin-bottom: 4px;
+            border-radius: 50%;
+            object-fit: cover;
+            /* 给图标加一个微弱的边框 */
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .fallback-icon {
+            background: #dfe4ea;
+            color: #57606f;
+            width: 22px;
+            height: 22px;
+            margin-bottom: 4px;
+            border-radius: 50%;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .nav-item span { font-size: 11px; font-weight: 500; }
+
+        /* === 主容器 === */
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        /* === 站点区块 === */
+        .site-section {
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+            /* 这里的变量会由JS动态注入 */
+            --theme-color: var(--default-color);
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .site-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-left: 4px;
+        }
+
+        /* 站点徽标：使用品牌背景色 */
+        .site-header .badge {
+            background: var(--theme-color);
+            color: #fff;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-right: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .site-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* === 活动卡片 === */
+        .activity-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: var(--shadow-sm);
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+            /* 左侧装饰条：使用品牌色 */
+            border-left: 4px solid var(--theme-color);
+            transition: transform 0.2s ease;
+        }
+
+        a.activity-card:active {
+            transform: scale(0.98);
+            background: #fafafa;
+        }
+        
+        div.activity-card { cursor: default; }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .title {
+            font-weight: 600;
+            font-size: 15px;
+            line-height: 1.5;
+            color: var(--text-main);
+            flex: 1;
+            word-break: break-all; 
+        }
+
+        /* GO按钮：品牌背景色 + 白色文字 */
+        .go-btn {
+            background: var(--theme-color);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 5px 14px;
+            border-radius: 20px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        
+        .go-btn::after { content: "→"; font-size: 14px; margin-top: -1px; }
+
+        /* 扩展文本内容 (保持灰色，不伤眼) */
+        .text-content {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #57606f;
+            background: #f8f9fa;
+            padding: 10px 12px;
+            border-radius: 8px;
+            /* 左边框使用浅灰，避免喧宾夺主，或者可以使用极淡的品牌色 */
+            border-left: 2px solid #dfe4ea;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .photo-grid img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            border-radius: 6px;
+            background: #eee;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+    </style>
 </head>
 <body>
-    <h1>欢迎访问我的静态网站</h1>
-    <p>这是一个简单的静态页面示例。</p>
+
+<nav class="top-nav" id="topNav"></nav>
+<div class="container" id="content"></div>
+
+<script>
+// === 数据源 (已包含 color 属性) ===
+const infoList = [
+    {
+        "site": "京东",
+        "icon": "https://www.jd.com/favicon.ico",
+        "color": "#FF0F23", // 京东红
+        "acivity": [
+           { "title": "京东外卖活动 1 每天领取" ,"url": "https://u.jd.com/JrIR3mU"},
+		   { "url": "https://pro.m.jd.com/mall/active/2wVS4PFwmsopaEGTWps25CtwXmtd/index.html?addressID=0&provinceCode=13&province=%E5%B1%B1%E4%B8%9C&cityCode=1007&city=%E9%9D%92%E5%B2%9B%E5%B8%82&districtCode=3521&district=%E5%B8%82%E5%8D%97%E5%8C%BA&townCode=59753&town=%E9%A6%99%E6%B8%AF%E4%B8%AD%E8%B7%AF%E8%A1%97%E9%81%93&fullAddress=%E5%B1%B1%E4%B8%9C%E9%9D%92%E5%B2%9B%E5%B8%82%E5%B8%82%E5%8D%97%E5%8C%BA%E9%A6%99%E6%B8%AF%E4%B8%AD%E8%B7%AF%E8%A1%97%E9%81%93%E9%A6%99%E6%B8%AF%E4%B8%AD%E8%B7%AF%E4%B8%80%E4%B9%9D%E5%8F%B7&detailAddress=%E9%A6%99%E6%B8%AF%E4%B8%AD%E8%B7%AF%E4%B8%80%E4%B9%9D%E5%8F%B7&lng=120.38773&lat=36.06671&lbsData=USiYJrYVEeyJhZGRyZXNzSUQiOjAsInByb3ZpbmNlQ29kZSI6MTMsInByb3ZpbmNlIjoi5bGx5LicIiwiY2l0eUNvZGUiOjEwMDcsImNpdHkiOiLpnZLlspvluIIiLCJkaXN0cmljdENvZGUiOjM1MjEsImRpc3RyaWN0Ijoi5biC5Y2X5Yy6IiwidG93bkNvZGUiOjU5NzUzLCJ0b3duIjoi6aaZ5riv5Lit6Lev6KGX6YGTIiwiZnVsbEFkZHJlc3MiOiLlsbHkuJzpnZLlspvluILluILljZfljLrpppnmuK%2FkuK3ot6%2FooZfpgZPpppnmuK%2FkuK3ot6%2FkuIDkuZ3lj7ciLCJkZXRhaWxBZGRyZXNzIjoi6aaZ5riv5Lit6Lev5LiA5Lmd5Y%2B3IiwibG5nIjoxMjAuMzg3NzMsImxhdCI6MzYuMDY2NzF9&hasChanged=1", "title": "京东外卖活动 2" },
+		   { "url": "https://pro.m.jd.com/mall/active/2aicp3xPNbmd35C517GyxYjiKN7x/index.html?cu=true&utm_source=lianmeng__10__go.smzdm.com&utm_medium=tuiguang&utm_campaign=t_1000089893_156_0_184__ae2dd540875b2f83&utm_term=be855ecf290f40c78e5f52222f3ff7c5&addressID=0&provinceCode=19&province=%E5%B9%BF%E4%B8%9C&cityCode=1601&city=%E5%B9%BF%E5%B7%9E%E5%B8%82&districtCode=36953&district=%E7%95%AA%E7%A6%BA%E5%8C%BA&townCode=62865&town=%E5%B8%82%E6%A1%A5%E8%A1%97%E9%81%93&fullAddress=%E5%B9%BF%E4%B8%9C%E5%B9%BF%E5%B7%9E%E5%B8%82%E7%95%AA%E7%A6%BA%E5%8C%BA%E5%B8%82%E6%A1%A5%E8%A1%97%E9%81%93%E6%B8%85%E6%B2%B3%E4%B8%9C%E8%B7%AF%E4%B8%89%E4%B8%80%E4%B9%9D%E5%8F%B7&detailAddress=%E6%B8%85%E6%B2%B3%E4%B8%9C%E8%B7%AF%E4%B8%89%E4%B8%80%E4%B9%9D%E5%8F%B7&lng=113.38397&lat=22.93599&lbsData=vIoAXDMZjeyJhZGRyZXNzSUQiOjAsInByb3ZpbmNlQ29kZSI6MTksInByb3ZpbmNlIjoi5bm%2F5LicIiwiY2l0eUNvZGUiOjE2MDEsImNpdHkiOiLlub%2Flt57luIIiLCJkaXN0cmljdENvZGUiOjM2OTUzLCJkaXN0cmljdCI6IueVquemuuWMuiIsInRvd25Db2RlIjo2Mjg2NSwidG93biI6IuW4guahpeihl%2BmBkyIsImZ1bGxBZGRyZXNzIjoi5bm%2F5Lic5bm%2F5bee5biC55Wq56a65Yy65biC5qGl6KGX6YGT5riF5rKz5Lic6Lev5LiJ5LiA5Lmd5Y%2B3IiwiZGV0YWlsQWRkcmVzcyI6Iua4heays%2BS4nOi3r%2BS4ieS4gOS5neWPtyIsImxuZyI6MTEzLjM4Mzk3LCJsYXQiOjIyLjkzNTk5fQ%3D%3D&hasChanged=1", "title": "京东外卖活动 3" },
+		   { "url": "https://pro.m.jd.com/mall/active/3RQYAnPPrdoyZmNJWL9Jtp7TAymZ/index.html?cu=true&utm_source=lianmeng__10__go.smzdm.com&utm_medium=tuiguang&utm_campaign=t_1000089893_156_0_184__3c08cc258ad84c17&utm_term=d040b1b751f449e5b95d5c9e9206f633", "title": "京东外卖活动 4" },
+		   { "url": "https://u.jd.com/JDISNWk", "title": "JD 购物 每天领红包  年货节" }
+        ]
+    },
+    {
+        "site": "美团",
+        "color": "#ffba1e", // 美团黄
+        "icon": "https://www.meituan.com/favicon.ico",
+        "acivity": [
+            { "url": "https://mt.a1test.com/a1", "title": "美团外卖红包" },
+            { "url": "https://m2.a1test.com/a2", "title": "美团周边游" }
+        ]
+    },
+    {
+        "site": "淘宝",
+        "color": "#ff6a00", // 淘宝橙 (稍微调整了一下以示区分)
+        "icon": "https://www.taobao.com/favicon.ico",
+        "acivity": [
+            { "url": "", "title": "淘宝" },
+            { "url": "", "title": "淘宝" }
+        ]
+    },
+    {
+        "site": "淘宝闪购",
+        "color": "#FF0F23",
+        "icon": "https://www.taobao.com/favicon.ico",
+        "acivity": [
+            { "title": "淘宝闪购1", "url":"",
+              "text": "淘宝闪购输入99999",
+              "photos":"test1.png,test2.png"
+            }
+        ]
+    },
+    {
+        "site": "抖音",
+        "color": "#1c1e21", // 抖音黑/紫 (这里用黑色代替，避免渐变色处理复杂)
+        "icon": "https://www.douyin.com/favicon.ico",
+        "acivity": [
+            { "title": "抖音1", "url": "https://m2.a1test.com/a2"}
+        ]
+    }
+];
+
+const topNav = document.getElementById('topNav');
+const content = document.getElementById('content');
+
+function init() {
+    infoList.forEach((site, index) => {
+        renderNav(site, index);
+        renderSection(site, index);
+    });
+    initScrollSpy();
+}
+
+function renderNav(site, index) {
+    const navItem = document.createElement('a');
+    navItem.className = 'nav-item';
+    navItem.href = `#site-${index}`;
+    navItem.dataset.target = `site-${index}`;
+    
+    // 【重点】这里将 color 注入到 CSS 变量中
+    // 如果没有 color 属性，默认灰色
+    const siteColor = site.color || '#57606f';
+    navItem.style.setProperty('--site-color', siteColor);
+
+    // 图标处理
+    const iconHtml = `
+        <img src="${site.icon}" 
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" 
+             alt="${site.site}">
+        <div class="fallback-icon" style="display:none">${site.site.charAt(0).toUpperCase()}</div>
+    `;
+    const finalIconHtml = site.icon ? iconHtml : `<div class="fallback-icon">${site.site.charAt(0).toUpperCase()}</div>`;
+
+    navItem.innerHTML = `
+        ${finalIconHtml}
+        <span>${site.site}</span>
+    `;
+    
+    navItem.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        navItem.classList.add('active');
+        navItem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+
+        const targetSection = document.getElementById(`site-${index}`);
+        if (targetSection) {
+            const offsetTop = targetSection.offsetTop - 70;
+            window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+        }
+    });
+
+    topNav.appendChild(navItem);
+}
+
+function renderSection(site, index) {
+    const section = document.createElement('div');
+    section.className = 'site-section';
+    section.id = `site-${index}`;
+
+    // 【重点】这里将 color 注入到区块的 CSS 变量中
+    const themeColor = site.color || '#ff4757';
+    section.style.setProperty('--theme-color', themeColor);
+    
+    let activityHtml = '';
+    const acts = site.acivity || site.activities || [];
+
+    acts.forEach(act => {
+        const hasUrl = act.url && act.url.trim() !== "";
+        const tag = hasUrl ? 'a' : 'div';
+        const hrefAttr = hasUrl ? `href="${act.url}" target="_blank"` : '';
+        
+        // 按钮也无需单独写 style，因为它会自动继承 section 的 --theme-color
+        const btnHtml = hasUrl ? `<div class="go-btn">GO</div>` : '';
+
+        const textTag = (act.text && act.text.trim()) 
+            ? `<div class="text-content">${act.text}</div>` 
+            : '';
+        
+        let photoTag = '';
+        if (act.photos && act.photos.trim()) {
+            const photoList = act.photos.split(',');
+            photoTag = `<div class="photo-grid">
+                ${photoList.map(p => `<img src="${p.trim()}" onerror="this.style.backgroundColor='#eee';this.alt='img'">`).join('')}
+            </div>`;
+        }
+
+        activityHtml += `
+            <${tag} ${hrefAttr} class="activity-card">
+                <div class="card-header">
+                    <div class="title">${act.title}</div>
+                    ${btnHtml}
+                </div>
+                ${textTag}
+                ${photoTag}
+            </${tag}>
+        `;
+    });
+
+    section.innerHTML = `
+        <div class="site-header">
+            <span class="badge">${site.site}</span>
+            <span class="site-title">精选内容</span>
+        </div>
+        ${activityHtml}
+    `;
+    content.appendChild(section);
+}
+
+function initScrollSpy() {
+    const navItems = document.querySelectorAll('.nav-item');
+    const sections = document.querySelectorAll('.site-section');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.id;
+                navItems.forEach(nav => {
+                    nav.classList.remove('active');
+                    if (nav.dataset.target === id) {
+                        nav.classList.add('active');
+                        nav.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    }
+                });
+            }
+        });
+    }, { rootMargin: '-20% 0px -60% 0px' });
+
+    sections.forEach(section => observer.observe(section));
+}
+
+init();
+</script>
+
 </body>
 </html>
