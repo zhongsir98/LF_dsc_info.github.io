@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>活动快报</title>
     <style>
+        /* ... 样式部分保持不变，直接复用之前的 CSS ... */
         :root {
             --bg: #f7f8fa;
             --card-bg: #ffffff;
@@ -25,7 +26,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* === 顶部导航 === */
         .top-nav {
             position: sticky;
             top: 0;
@@ -103,7 +103,6 @@
 
         .nav-item span { font-size: 11px; font-weight: 500; }
 
-        /* === 主容器 === */
         .container {
             max-width: 700px;
             margin: 0 auto;
@@ -145,7 +144,6 @@
             color: var(--text-main);
         }
 
-        /* === 活动卡片 === */
         .activity-card {
             background: var(--card-bg);
             border-radius: var(--border-radius);
@@ -180,7 +178,6 @@
             padding-top: 2px;
         }
 
-        /* GO按钮 */
         .go-btn {
             background: var(--theme-color);
             color: #fff;
@@ -206,7 +203,6 @@
             opacity: 0.9;
         }
 
-        /* 扩展内容 */
         .text-content {
             font-size: 13px;
             line-height: 1.6;
@@ -217,7 +213,6 @@
             border-left: 2px solid #dfe4ea;
         }
 
-        /* 口令区域 */
         .command-box {
             background: #fff;
             border: 1px dashed var(--theme-color);
@@ -274,7 +269,6 @@
             border: 1px solid rgba(0,0,0,0.05);
         }
 
-        /* Toast */
         .toast-msg {
             position: fixed;
             top: 50%;
@@ -293,7 +287,6 @@
             pointer-events: none; 
         }
         .toast-msg.show { opacity: 1; }
-
     </style>
 </head>
 <body>
@@ -302,13 +295,6 @@
 <div class="container" id="content"></div>
 
 <script>
-/**
- * 配置说明：
- * url: 网页跳转链接（必须，作为兜底）
- * scheme: (新增) APP 唤起协议头。
- * 京东示例: openapp.jdmobile://virtual?params={"category":"jump","des":"m","url":"你的网页链接"}
- * 淘宝示例: taobao://你的网页链接 (去掉https://)
- */
 const infoList = [
     {
         "site": "京东",
@@ -316,16 +302,12 @@ const infoList = [
         "color": "#FF0F23",
         "acivity": [
             { 
-                "title": "京东外卖活动 1 ",
+                "title": "京东外卖活动 1 (自动唤起)",
+                // 你只需要在这里填正常的网页链接，下面的JS会自动帮你转换成openapp协议
                 "url": "https://u.jd.com/JrIR3mU",
-                // 这是一个京东通用的唤起协议，会自动把 url 参数里的链接在APP内打开
-                "scheme": "openapp.jdmobile://virtual?params={\"category\":\"jump\",\"des\":\"m\",\"url\":\"https://u.jd.com/JrIR3mU\"}",
                 "command": "14:/热门促销会场！⇴Jīιng□崬！T6JVPFjxi4d2LiM3！ MF3390 " 
             },
-            { 
-                "title": "京东年货节 (普通链接)", 
-                "url": "https://u.jd.com/JDISNWk" 
-            },
+            { "url": "https://u.jd.com/JDISNWk", "title": "JD 购物 每天领红包" },
         ]
     },
     {
@@ -335,9 +317,7 @@ const infoList = [
         "acivity": [
             { 
                 "url": "https://mt.a1test.com/a1", 
-                "title": "美团外卖红包",
-                // 美团通常可以直接用 imeituan:// 
-                "scheme": "imeituan://www.meituan.com/web?url=https://mt.a1test.com/a1"
+                "title": "美团外卖红包"
             }
         ]
     },
@@ -348,9 +328,7 @@ const infoList = [
         "acivity": [
             { 
                 "url": "https://m.taobao.com", 
-                "title": "淘宝首页",
-                // 淘宝可以直接把 https 换成 taobao 协议
-                "scheme": "taobao://m.taobao.com"
+                "title": "淘宝首页"
             }
         ]
     },
@@ -375,12 +353,12 @@ function init() {
     initScrollSpy();
 }
 
+// 渲染导航 (保持不变)
 function renderNav(site, index) {
     const navItem = document.createElement('a');
     navItem.className = 'nav-item';
     navItem.href = `#site-${index}`;
     navItem.dataset.target = `site-${index}`;
-    
     const siteColor = site.color || '#57606f';
     navItem.style.setProperty('--site-color', siteColor);
 
@@ -391,28 +369,23 @@ function renderNav(site, index) {
         <div class="fallback-icon" style="display:none">${site.site.charAt(0).toUpperCase()}</div>
     `;
     const finalIconHtml = site.icon ? iconHtml : `<div class="fallback-icon">${site.site.charAt(0).toUpperCase()}</div>`;
-
-    navItem.innerHTML = `
-        ${finalIconHtml}
-        <span>${site.site}</span>
-    `;
+    navItem.innerHTML = `${finalIconHtml}<span>${site.site}</span>`;
     
     navItem.addEventListener('click', (e) => {
         e.preventDefault();
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         navItem.classList.add('active');
         navItem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-
         const targetSection = document.getElementById(`site-${index}`);
         if (targetSection) {
             const offsetTop = targetSection.offsetTop - 70;
             window.scrollTo({ top: offsetTop, behavior: 'smooth' });
         }
     });
-
     topNav.appendChild(navItem);
 }
 
+// 渲染内容区
 function renderSection(site, index) {
     const section = document.createElement('div');
     section.className = 'site-section';
@@ -426,25 +399,18 @@ function renderSection(site, index) {
 
     acts.forEach(act => {
         const hasUrl = act.url && act.url.trim() !== "";
-        
-        // 【核心修改】
-        // 如果有 scheme (APP协议)，优先使用 JS 处理点击
-        // 如果只有 url，使用普通 href
-        // 我们把 url 和 scheme 都存入 dataset，交给 handleGoClick 处理
         let btnHtml = '';
         if (hasUrl) {
-            const schemeData = act.scheme ? `data-scheme="${act.scheme}"` : '';
-            // 注意：这里把 href 设为 javascript:;，点击逻辑完全由 onclick 接管
+            // 我们把 site 名称也传进去，方便在 handleGoClick 里做判断
             btnHtml = `<a href="javascript:;" 
                           data-url="${act.url}" 
-                          ${schemeData}
+                          data-scheme="${act.scheme || ''}"
+                          data-site="${site.site}" 
                           onclick="handleGoClick(event, this)" 
                           class="go-btn">GO</a>`;
         }
 
-        const textTag = (act.text && act.text.trim()) 
-            ? `<div class="text-content">${act.text}</div>` 
-            : '';
+        const textTag = (act.text && act.text.trim()) ? `<div class="text-content">${act.text}</div>` : '';
 
         let commandTag = '';
         if (act.command && act.command.trim()) {
@@ -492,41 +458,57 @@ function renderSection(site, index) {
     content.appendChild(section);
 }
 
-// === 处理 GO 按钮点击 (唤起 APP 逻辑) ===
+// === 核心逻辑修改：自动生成跳转协议 ===
 function handleGoClick(event, element) {
     event.preventDefault();
     event.stopPropagation();
 
     const url = element.dataset.url;
-    const scheme = element.dataset.scheme;
+    let scheme = element.dataset.scheme; // 如果JSON里手动配了，优先用手动配的
+    const site = element.dataset.site;
 
-    // 1. 如果没有 scheme，直接打开网页
+    // 如果没有手动配置 scheme，我们根据站点自动生成
     if (!scheme) {
-        window.location.href = url;
-        return;
+        if (site === '京东' || url.includes('jd.com')) {
+            // 【京东 核心修复】
+            // 必须对 params 内部的 JSON 进行 encodeURIComponent
+            // des: 'm' 表示打开内置M页
+            const params = {
+                category: 'jump',
+                des: 'm',
+                url: url
+            };
+            scheme = `openapp.jdmobile://virtual?params=${encodeURIComponent(JSON.stringify(params))}`;
+        } 
+        else if (site === '淘宝' || url.includes('taobao.com') || url.includes('tmall.com')) {
+            // 淘宝: 去掉 https:// 头部
+            const cleanUrl = url.replace(/^https?:\/\//, '');
+            scheme = `taobao://${cleanUrl}`;
+        }
+        else if (site === '美团' || url.includes('meituan.com')) {
+            // 美团
+            scheme = `imeituan://www.meituan.com/web?url=${encodeURIComponent(url)}`;
+        }
     }
 
-    // 2. 尝试唤起 APP
-    // 原理：先让页面跳到 scheme 协议，设置一个定时器
-    // 如果 APP 唤起成功，页面进入后台，定时器会变慢或暂停（浏览器差异）
-    // 如果唤起失败，页面还在前台，定时器触发，跳转网页版兜底
-    
-    const startTime = Date.now();
-    
-    // 尝试拉起
-    window.location.href = scheme;
+    // 执行跳转逻辑
+    if (scheme) {
+        const startTime = Date.now();
+        window.location.href = scheme;
 
-    // 兜底逻辑：2秒后如果还在当前页，则跳转网页链接
-    setTimeout(function() {
-        const endTime = Date.now();
-        // 如果时间差在合理范围内（说明页面没有被 APP 挂起），则认为唤起失败，跳转 H5
-        if (endTime - startTime < 2200) {
-             window.location.href = url;
-        }
-    }, 2000);
+        // 兜底：如果2.2秒后还在当前页面（说明没唤起成功），跳转网页
+        setTimeout(function() {
+            if (Date.now() - startTime < 2200) {
+                 window.location.href = url;
+            }
+        }, 2000);
+    } else {
+        // 没有匹配到协议，直接打开网页
+        window.location.href = url;
+    }
 }
 
-// ... (复制功能保持不变) ...
+// 复制逻辑 (保持不变)
 function handleCopyClick(event, element) {
     event.preventDefault();
     event.stopPropagation();
