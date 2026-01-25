@@ -13,7 +13,6 @@
             --border-radius: 12px;
             --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
             --nav-height: 60px;
-            /* 默认兜底颜色 */
             --default-color: #57606f; 
         }
 
@@ -59,18 +58,15 @@
             min-width: 50px;
             cursor: pointer;
             position: relative;
-            /* 这里的变量会由JS动态注入 */
             --site-color: var(--default-color); 
         }
 
-        /* 选中状态：文字变色，背景微亮 */
         .nav-item.active {
             color: var(--site-color);
             background: #fff;
             transform: translateY(-1px);
         }
 
-        /* 选中时底部增加一个小横条 */
         .nav-item.active::after {
             content: '';
             position: absolute;
@@ -87,7 +83,6 @@
             margin-bottom: 4px;
             border-radius: 50%;
             object-fit: cover;
-            /* 给图标加一个微弱的边框 */
             border: 1px solid rgba(0,0,0,0.05);
         }
         
@@ -115,12 +110,10 @@
             padding: 15px;
         }
 
-        /* === 站点区块 === */
         .site-section {
             margin-bottom: 30px;
             opacity: 0;
             animation: fadeIn 0.5s forwards;
-            /* 这里的变量会由JS动态注入 */
             --theme-color: var(--default-color);
         }
 
@@ -135,7 +128,6 @@
             padding-left: 4px;
         }
 
-        /* 站点徽标：使用品牌背景色 */
         .site-header .badge {
             background: var(--theme-color);
             color: #fff;
@@ -163,27 +155,19 @@
             flex-direction: column;
             gap: 10px;
             box-shadow: var(--shadow-sm);
-            text-decoration: none;
             color: inherit;
             position: relative;
             overflow: hidden;
-            /* 左侧装饰条：使用品牌色 */
             border-left: 4px solid var(--theme-color);
-            transition: transform 0.2s ease;
+            cursor: default; 
         }
-
-        a.activity-card:active {
-            transform: scale(0.98);
-            background: #fafafa;
-        }
-        
-        div.activity-card { cursor: default; }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             gap: 10px;
+            min-height: 24px; 
         }
 
         .title {
@@ -193,9 +177,10 @@
             color: var(--text-main);
             flex: 1;
             word-break: break-all; 
+            padding-top: 2px;
         }
 
-        /* GO按钮：品牌背景色 + 白色文字 */
+        /* GO按钮 */
         .go-btn {
             background: var(--theme-color);
             color: #fff;
@@ -209,11 +194,19 @@
             align-items: center;
             gap: 3px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            text-decoration: none; 
+            transition: transform 0.1s, opacity 0.2s;
+            cursor: pointer;
         }
         
         .go-btn::after { content: "→"; font-size: 14px; margin-top: -1px; }
 
-        /* 扩展文本内容 (保持灰色，不伤眼) */
+        .go-btn:active {
+            transform: scale(0.95);
+            opacity: 0.9;
+        }
+
+        /* 扩展内容 */
         .text-content {
             font-size: 13px;
             line-height: 1.6;
@@ -221,8 +214,48 @@
             background: #f8f9fa;
             padding: 10px 12px;
             border-radius: 8px;
-            /* 左边框使用浅灰，避免喧宾夺主，或者可以使用极淡的品牌色 */
             border-left: 2px solid #dfe4ea;
+        }
+
+        /* 口令区域 */
+        .command-box {
+            background: #fff;
+            border: 1px dashed var(--theme-color);
+            background-color: rgba(0,0,0,0.02);
+            padding: 8px 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .command-text {
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--theme-color);
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            flex: 1;
+        }
+
+        .copy-btn {
+            font-size: 12px;
+            color: var(--theme-color);
+            background: rgba(255,255,255,0.8);
+            border: 1px solid var(--theme-color);
+            padding: 4px 10px;
+            border-radius: 12px;
+            white-space: nowrap;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:active {
+            background: var(--theme-color);
+            color: #fff;
         }
 
         .photo-grid {
@@ -241,6 +274,26 @@
             border: 1px solid rgba(0,0,0,0.05);
         }
 
+        /* Toast */
+        .toast-msg {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 9999;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none; 
+        }
+        .toast-msg.show { opacity: 1; }
+
     </style>
 </head>
 <body>
@@ -249,55 +302,64 @@
 <div class="container" id="content"></div>
 
 <script>
-// === 数据源 (已包含 color 属性) ===
+/**
+ * 配置说明：
+ * url: 网页跳转链接（必须，作为兜底）
+ * scheme: (新增) APP 唤起协议头。
+ * 京东示例: openapp.jdmobile://virtual?params={"category":"jump","des":"m","url":"你的网页链接"}
+ * 淘宝示例: taobao://你的网页链接 (去掉https://)
+ */
 const infoList = [
     {
         "site": "京东",
         "icon": "https://www.jd.com/favicon.ico",
-        "color": "#FF0F23", // 京东红
+        "color": "#FF0F23",
         "acivity": [
-           { "title": "京东外卖活动 1 每天领取" ,"url": "https://u.jd.com/JrIR3mU"},
-		   { "url": "https://pro.m.jd.com/mall/active/2wVS4PFwmsopaEGTWps25CtwXmtd/index.html?addressID=0&provinceCode=13&province=%E5%B1%B1%E4%B8%9C&cityCode=1007&city=%E9%9D%92%E5%B2%9B%E5%B8%82&districtCode=3521&district=%E5%B8%82%E5%8D%97%E5%8C%BA&townCode=59753&town=%E9%A6%99%E6%B8%AF%E4%B8%AD%E8%B7%AF%E8%A1%97%E9%81%93&fullAddress=%E5%B1%B1%E4%B8%9C%E9%9D%92%E5%B2%9B%E5%B8%82%E5%B8%82%E5%8D%97%E5%8C%BA%E9%A6%99%E6%B8%AF%E4%B8%AD%E8%B7%AF%E8%A1%97%E9%81%93%E9%A6%99%E6%B8%AF%E4%B8%AD%E8%B7%AF%E4%B8%80%E4%B9%9D%E5%8F%B7&detailAddress=%E9%A6%99%E6%B8%AF%E4%B8%AD%E8%B7%AF%E4%B8%80%E4%B9%9D%E5%8F%B7&lng=120.38773&lat=36.06671&lbsData=USiYJrYVEeyJhZGRyZXNzSUQiOjAsInByb3ZpbmNlQ29kZSI6MTMsInByb3ZpbmNlIjoi5bGx5LicIiwiY2l0eUNvZGUiOjEwMDcsImNpdHkiOiLpnZLlspvluIIiLCJkaXN0cmljdENvZGUiOjM1MjEsImRpc3RyaWN0Ijoi5biC5Y2X5Yy6IiwidG93bkNvZGUiOjU5NzUzLCJ0b3duIjoi6aaZ5riv5Lit6Lev6KGX6YGTIiwiZnVsbEFkZHJlc3MiOiLlsbHkuJzpnZLlspvluILluILljZfljLrpppnmuK%2FkuK3ot6%2FooZfpgZPpppnmuK%2FkuK3ot6%2FkuIDkuZ3lj7ciLCJkZXRhaWxBZGRyZXNzIjoi6aaZ5riv5Lit6Lev5LiA5Lmd5Y%2B3IiwibG5nIjoxMjAuMzg3NzMsImxhdCI6MzYuMDY2NzF9&hasChanged=1", "title": "京东外卖活动 2" },
-		   { "url": "https://pro.m.jd.com/mall/active/2aicp3xPNbmd35C517GyxYjiKN7x/index.html?cu=true&utm_source=lianmeng__10__go.smzdm.com&utm_medium=tuiguang&utm_campaign=t_1000089893_156_0_184__ae2dd540875b2f83&utm_term=be855ecf290f40c78e5f52222f3ff7c5&addressID=0&provinceCode=19&province=%E5%B9%BF%E4%B8%9C&cityCode=1601&city=%E5%B9%BF%E5%B7%9E%E5%B8%82&districtCode=36953&district=%E7%95%AA%E7%A6%BA%E5%8C%BA&townCode=62865&town=%E5%B8%82%E6%A1%A5%E8%A1%97%E9%81%93&fullAddress=%E5%B9%BF%E4%B8%9C%E5%B9%BF%E5%B7%9E%E5%B8%82%E7%95%AA%E7%A6%BA%E5%8C%BA%E5%B8%82%E6%A1%A5%E8%A1%97%E9%81%93%E6%B8%85%E6%B2%B3%E4%B8%9C%E8%B7%AF%E4%B8%89%E4%B8%80%E4%B9%9D%E5%8F%B7&detailAddress=%E6%B8%85%E6%B2%B3%E4%B8%9C%E8%B7%AF%E4%B8%89%E4%B8%80%E4%B9%9D%E5%8F%B7&lng=113.38397&lat=22.93599&lbsData=vIoAXDMZjeyJhZGRyZXNzSUQiOjAsInByb3ZpbmNlQ29kZSI6MTksInByb3ZpbmNlIjoi5bm%2F5LicIiwiY2l0eUNvZGUiOjE2MDEsImNpdHkiOiLlub%2Flt57luIIiLCJkaXN0cmljdENvZGUiOjM2OTUzLCJkaXN0cmljdCI6IueVquemuuWMuiIsInRvd25Db2RlIjo2Mjg2NSwidG93biI6IuW4guahpeihl%2BmBkyIsImZ1bGxBZGRyZXNzIjoi5bm%2F5Lic5bm%2F5bee5biC55Wq56a65Yy65biC5qGl6KGX6YGT5riF5rKz5Lic6Lev5LiJ5LiA5Lmd5Y%2B3IiwiZGV0YWlsQWRkcmVzcyI6Iua4heays%2BS4nOi3r%2BS4ieS4gOS5neWPtyIsImxuZyI6MTEzLjM4Mzk3LCJsYXQiOjIyLjkzNTk5fQ%3D%3D&hasChanged=1", "title": "京东外卖活动 3" },
-		   { "url": "https://pro.m.jd.com/mall/active/3RQYAnPPrdoyZmNJWL9Jtp7TAymZ/index.html?cu=true&utm_source=lianmeng__10__go.smzdm.com&utm_medium=tuiguang&utm_campaign=t_1000089893_156_0_184__3c08cc258ad84c17&utm_term=d040b1b751f449e5b95d5c9e9206f633", "title": "京东外卖活动 4" },
-		   { "url": "https://u.jd.com/JDISNWk", "title": "JD 购物 每天领红包  年货节" }
+            { 
+                "title": "京东外卖活动 1 ",
+                "url": "https://u.jd.com/JrIR3mU",
+                // 这是一个京东通用的唤起协议，会自动把 url 参数里的链接在APP内打开
+                "scheme": "openapp.jdmobile://virtual?params={\"category\":\"jump\",\"des\":\"m\",\"url\":\"https://u.jd.com/JrIR3mU\"}",
+                "command": "14:/热门促销会场！⇴Jīιng□崬！T6JVPFjxi4d2LiM3！ MF3390 " 
+            },
+            { 
+                "title": "京东年货节 (普通链接)", 
+                "url": "https://u.jd.com/JDISNWk" 
+            },
         ]
     },
     {
         "site": "美团",
-        "color": "#ffba1e", // 美团黄
+        "color": "#ffba1e",
         "icon": "https://www.meituan.com/favicon.ico",
         "acivity": [
-            { "url": "https://mt.a1test.com/a1", "title": "美团外卖红包" },
-            { "url": "https://m2.a1test.com/a2", "title": "美团周边游" }
+            { 
+                "url": "https://mt.a1test.com/a1", 
+                "title": "美团外卖红包",
+                // 美团通常可以直接用 imeituan:// 
+                "scheme": "imeituan://www.meituan.com/web?url=https://mt.a1test.com/a1"
+            }
         ]
     },
     {
         "site": "淘宝",
-        "color": "#ff6a00", // 淘宝橙 (稍微调整了一下以示区分)
+        "color": "#ff6a00",
         "icon": "https://www.taobao.com/favicon.ico",
         "acivity": [
-            { "url": "", "title": "淘宝" },
-            { "url": "", "title": "淘宝" }
-        ]
-    },
-    {
-        "site": "淘宝闪购",
-        "color": "#FF0F23",
-        "icon": "https://www.taobao.com/favicon.ico",
-        "acivity": [
-            { "title": "淘宝闪购1", "url":"",
-              "text": "淘宝闪购输入99999",
-              "photos":"test1.png,test2.png"
+            { 
+                "url": "https://m.taobao.com", 
+                "title": "淘宝首页",
+                // 淘宝可以直接把 https 换成 taobao 协议
+                "scheme": "taobao://m.taobao.com"
             }
         ]
     },
     {
         "site": "抖音",
-        "color": "#1c1e21", // 抖音黑/紫 (这里用黑色代替，避免渐变色处理复杂)
+        "color": "#1c1e21",
         "icon": "https://www.douyin.com/favicon.ico",
         "acivity": [
-            { "title": "抖音1", "url": "https://m2.a1test.com/a2"}
+            { "title": "抖音商城", "url": "https://www.douyin.com"}
         ]
     }
 ];
@@ -319,12 +381,9 @@ function renderNav(site, index) {
     navItem.href = `#site-${index}`;
     navItem.dataset.target = `site-${index}`;
     
-    // 【重点】这里将 color 注入到 CSS 变量中
-    // 如果没有 color 属性，默认灰色
     const siteColor = site.color || '#57606f';
     navItem.style.setProperty('--site-color', siteColor);
 
-    // 图标处理
     const iconHtml = `
         <img src="${site.icon}" 
              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" 
@@ -340,7 +399,6 @@ function renderNav(site, index) {
     
     navItem.addEventListener('click', (e) => {
         e.preventDefault();
-        
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         navItem.classList.add('active');
         navItem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
@@ -360,7 +418,6 @@ function renderSection(site, index) {
     section.className = 'site-section';
     section.id = `site-${index}`;
 
-    // 【重点】这里将 color 注入到区块的 CSS 变量中
     const themeColor = site.color || '#ff4757';
     section.style.setProperty('--theme-color', themeColor);
     
@@ -369,15 +426,40 @@ function renderSection(site, index) {
 
     acts.forEach(act => {
         const hasUrl = act.url && act.url.trim() !== "";
-        const tag = hasUrl ? 'a' : 'div';
-        const hrefAttr = hasUrl ? `href="${act.url}" target="_blank"` : '';
         
-        // 按钮也无需单独写 style，因为它会自动继承 section 的 --theme-color
-        const btnHtml = hasUrl ? `<div class="go-btn">GO</div>` : '';
+        // 【核心修改】
+        // 如果有 scheme (APP协议)，优先使用 JS 处理点击
+        // 如果只有 url，使用普通 href
+        // 我们把 url 和 scheme 都存入 dataset，交给 handleGoClick 处理
+        let btnHtml = '';
+        if (hasUrl) {
+            const schemeData = act.scheme ? `data-scheme="${act.scheme}"` : '';
+            // 注意：这里把 href 设为 javascript:;，点击逻辑完全由 onclick 接管
+            btnHtml = `<a href="javascript:;" 
+                          data-url="${act.url}" 
+                          ${schemeData}
+                          onclick="handleGoClick(event, this)" 
+                          class="go-btn">GO</a>`;
+        }
 
         const textTag = (act.text && act.text.trim()) 
             ? `<div class="text-content">${act.text}</div>` 
             : '';
+
+        let commandTag = '';
+        if (act.command && act.command.trim()) {
+            commandTag = `
+                <div class="command-box">
+                    <div class="command-text">${act.command}</div>
+                    <div class="copy-btn" 
+                         data-code="${encodeURIComponent(act.command)}" 
+                         data-site="${site.site}"
+                         onclick="handleCopyClick(event, this)">
+                        复制
+                    </div>
+                </div>
+            `;
+        }
         
         let photoTag = '';
         if (act.photos && act.photos.trim()) {
@@ -388,14 +470,15 @@ function renderSection(site, index) {
         }
 
         activityHtml += `
-            <${tag} ${hrefAttr} class="activity-card">
+            <div class="activity-card">
                 <div class="card-header">
                     <div class="title">${act.title}</div>
                     ${btnHtml}
                 </div>
                 ${textTag}
+                ${commandTag}
                 ${photoTag}
-            </${tag}>
+            </div>
         `;
     });
 
@@ -409,10 +492,96 @@ function renderSection(site, index) {
     content.appendChild(section);
 }
 
+// === 处理 GO 按钮点击 (唤起 APP 逻辑) ===
+function handleGoClick(event, element) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const url = element.dataset.url;
+    const scheme = element.dataset.scheme;
+
+    // 1. 如果没有 scheme，直接打开网页
+    if (!scheme) {
+        window.location.href = url;
+        return;
+    }
+
+    // 2. 尝试唤起 APP
+    // 原理：先让页面跳到 scheme 协议，设置一个定时器
+    // 如果 APP 唤起成功，页面进入后台，定时器会变慢或暂停（浏览器差异）
+    // 如果唤起失败，页面还在前台，定时器触发，跳转网页版兜底
+    
+    const startTime = Date.now();
+    
+    // 尝试拉起
+    window.location.href = scheme;
+
+    // 兜底逻辑：2秒后如果还在当前页，则跳转网页链接
+    setTimeout(function() {
+        const endTime = Date.now();
+        // 如果时间差在合理范围内（说明页面没有被 APP 挂起），则认为唤起失败，跳转 H5
+        if (endTime - startTime < 2200) {
+             window.location.href = url;
+        }
+    }, 2000);
+}
+
+// ... (复制功能保持不变) ...
+function handleCopyClick(event, element) {
+    event.preventDefault();
+    event.stopPropagation();
+    const code = decodeURIComponent(element.dataset.code);
+    const siteName = element.dataset.site;
+    copyToClipboard(code, siteName);
+}
+
+function copyToClipboard(text, siteName) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast(`复制成功，请到 ${siteName} APP 中打开`);
+        }).catch(() => fallbackCopy(text, siteName));
+    } else {
+        fallbackCopy(text, siteName);
+    }
+}
+
+function fallbackCopy(text, siteName) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";  
+    textArea.style.left = "-9999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+        if (document.execCommand('copy')) {
+            showToast(`复制成功，请到 ${siteName} APP 中打开`);
+        } else {
+            showToast('复制失败');
+        }
+    } catch (err) {
+        showToast('复制失败');
+    }
+    document.body.removeChild(textArea);
+}
+
+function showToast(message) {
+    const existing = document.querySelector('.toast-msg');
+    if (existing) existing.remove();
+    const toast = document.createElement('div');
+    toast.className = 'toast-msg';
+    toast.innerText = message;
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 2500);
+}
+
 function initScrollSpy() {
     const navItems = document.querySelectorAll('.nav-item');
     const sections = document.querySelectorAll('.site-section');
-    
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -427,7 +596,6 @@ function initScrollSpy() {
             }
         });
     }, { rootMargin: '-20% 0px -60% 0px' });
-
     sections.forEach(section => observer.observe(section));
 }
 
