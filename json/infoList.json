@@ -36,19 +36,20 @@
 		"color": "#ffba1e",
 		"icon": "https://www.meituan.com/favicon.ico",
 		"acivity": [{
-				"url": "https://mt.a1test.com/a1",
-				"title": "美团外卖红包"
+				"title": "美团外卖红包天天领",
+				"url": "http://dpurl.cn/XG0jFnQz",
+				"command":"1 %复制信息#% 打开团App http:/¥7sOTMzYWMzZDY¥一起领"
 			},
 			{
-				"url": "https://m2.a1test.com/a2",
-				"title": "美团周边游"
+				"title": "美团外卖品质商家红包",
+				"url": "http://dpurl.cn/LGSqTEdz"
 			}
 		]
 	},
 
 	{
 		"site": "淘宝闪购",
-		"color": "#FF0F23",
+		"color": "#409eff",
 		"icon": "https://www.taobao.com/favicon.ico",
 		"acivity": [{
 				"title": "淘宝闪购1",
