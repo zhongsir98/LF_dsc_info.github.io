@@ -1,0 +1,83 @@
+[{
+		"site": "京东",
+		"icon": "https://www.jd.com/favicon.ico",
+		"color": "#FF0F23",
+		"acivity": [{
+				"title": "百亿餐补 大额神券 每天领取",
+				"text": "瑞幸咖啡 9.9 两杯！",
+				"url": "https://u.jd.com/JrIR3mU",
+				"command": "14:/热门促销会场！⇴Jīιng□崬！T6JVPFjxi4d2LiM3！ MF3390 ",
+				"smallPhoto": [
+					"static/img1.jpg",
+					"static/img1.jpg"
+				]
+			},
+
+			{
+				"url": "https://pro.m.jd.com/mall/active/2aicp3xPNbmd35C517GyxYjiKN7x/index.html?cu=true&utm_source=lianmeng__10__go.smzdm.com&utm_medium=tuiguang&utm_campaign=t_1000089893_156_0_184__ae2dd540875b2f83&utm_term=be855ecf290f40c78e5f52222f3ff7c5&addressID=0&provinceCode=19&province=%E5%B9%BF%E4%B8%9C&cityCode=1601&city=%E5%B9%BF%E5%B7%9E%E5%B8%82&districtCode=36953&district=%E7%95%AA%E7%A6%BA%E5%8C%BA&townCode=62865&town=%E5%B8%82%E6%A1%A5%E8%A1%97%E9%81%93&fullAddress=%E5%B9%BF%E4%B8%9C%E5%B9%BF%E5%B7%9E%E5%B8%82%E7%95%AA%E7%A6%BA%E5%8C%BA%E5%B8%82%E6%A1%A5%E8%A1%97%E9%81%93%E6%B8%85%E6%B2%B3%E4%B8%9C%E8%B7%AF%E4%B8%89%E4%B8%80%E4%B9%9D%E5%8F%B7&detailAddress=%E6%B8%85%E6%B2%B3%E4%B8%9C%E8%B7%AF%E4%B8%89%E4%B8%80%E4%B9%9D%E5%8F%B7&lng=113.38397&lat=22.93599&lbsData=vIoAXDMZjeyJhZGRyZXNzSUQiOjAsInByb3ZpbmNlQ29kZSI6MTksInByb3ZpbmNlIjoi5bm%2F5LicIiwiY2l0eUNvZGUiOjE2MDEsImNpdHkiOiLlub%2Flt57luIIiLCJkaXN0cmljdENvZGUiOjM2OTUzLCJkaXN0cmljdCI6IueVquemuuWMuiIsInRvd25Db2RlIjo2Mjg2NSwidG93biI6IuW4guahpeihl%2BmBkyIsImZ1bGxBZGRyZXNzIjoi5bm%2F5Lic5bm%2F5bee5biC55Wq56a65Yy65biC5qGl6KGX6YGT5riF5rKz5Lic6Lev5LiJ5LiA5Lmd5Y%2B3IiwiZGV0YWlsQWRkcmVzcyI6Iua4heays%2BS4nOi3r%2BS4ieS4gOS5neWPtyIsImxuZyI6MTEzLjM4Mzk3LCJsYXQiOjIyLjkzNTk5fQ%3D%3D&hasChanged=1",
+				"title": "Plus 会员专属餐补",
+				"text": "需要plus会员才能领取"
+			},
+
+			{
+				"url": "https://u.jd.com/Jauphjy",
+				"title": "京东外卖满8减7 限时抢"
+			},
+
+			{
+				"url": "https://u.jd.com/JDISNWk",
+				"title": "JD 购物 每天领红包  年货节",
+				"text": "每天可领取 3 次"
+			}
+		]
+	},
+	{
+		"site": "美团",
+		"color": "#ffba1e",
+		"icon": "https://www.meituan.com/favicon.ico",
+		"acivity": [{
+				"url": "https://mt.a1test.com/a1",
+				"title": "美团外卖红包"
+			},
+			{
+				"url": "https://m2.a1test.com/a2",
+				"title": "美团周边游"
+			}
+		]
+	},
+
+	{
+		"site": "淘宝闪购",
+		"color": "#FF0F23",
+		"icon": "https://www.taobao.com/favicon.ico",
+		"acivity": [{
+				"title": "淘宝闪购1",
+				"url": "",
+				"text": "淘宝闪购输入99999"
+			},
+			{
+				"url": "https://u.ele.me/UNTe13Hj",
+				"title": "淘宝闪购 饿了么天天领红包",
+				"command": "0復制此段2:/＄U68s5OM＄~.淘宝闪购App【打开淘宝闪购APP扫红包】"
+			}
+		]
+	},
+	{
+		"site": "抖音",
+		"color": "#1c1e21",
+		"icon": "https://www.douyin.com/favicon.ico",
+		"acivity": [{
+			"title": "抖音1",
+			"url": "https://m2.a1test.com/a2"
+		}]
+	},
+	{
+		"site": "淘宝",
+		"color": "#ff6a00",
+		"icon": "https://www.taobao.com/favicon.ico",
+		"acivity": [{
+			"url": "https://u.ele.me/UNTe13Hj",
+			"title": "淘宝"
+		}]
+	}
+]
