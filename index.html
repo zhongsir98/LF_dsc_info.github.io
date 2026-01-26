@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>活动快报</title>
+    <title> 吃好饭 </title>
     <style>
-        /* ... 样式部分保持不变，直接复用之前的 CSS ... */
+        /* ... 此处省略 CSS，请保留之前的样式代码 ... */
         :root {
             --bg: #f7f8fa;
             --card-bg: #ffffff;
@@ -26,6 +26,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* 顶部导航 */
         .top-nav {
             position: sticky;
             top: 0;
@@ -253,13 +254,34 @@
             color: #fff;
         }
 
+        .small-photo-box {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+        }
+        
+        .small-photo-item {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            cursor: zoom-in;
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+            background-color: #eee;
+        }
+
+        .small-photo-item:active {
+            transform: scale(0.95);
+        }
+
         .photo-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
             margin-top: 5px;
         }
-
         .photo-grid img {
             width: 100%;
             aspect-ratio: 1/1;
@@ -267,6 +289,49 @@
             border-radius: 6px;
             background: #eee;
             border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .image-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            display: none; 
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .image-viewer.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .image-viewer img {
+            max-width: 95%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 4px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .image-viewer.active img {
+            transform: scale(1);
+        }
+        
+        .close-hint {
+            position: absolute;
+            bottom: 30px;
+            color: rgba(255,255,255,0.6);
+            font-size: 12px;
+            pointer-events: none;
         }
 
         .toast-msg {
@@ -281,10 +346,9 @@
             font-size: 14px;
             z-index: 9999;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             opacity: 0;
-            transition: opacity 0.3s ease;
             pointer-events: none; 
+            transition: opacity 0.3s;
         }
         .toast-msg.show { opacity: 1; }
     </style>
@@ -294,58 +358,42 @@
 <nav class="top-nav" id="topNav"></nav>
 <div class="container" id="content"></div>
 
-<script>
-const infoList = [
-    {
-        "site": "京东",
-        "icon": "https://www.jd.com/favicon.ico",
-        "color": "#FF0F23",
-        "acivity": [
-            { 
-                "title": "京东外卖活动 1 (自动唤起)",
-                // 你只需要在这里填正常的网页链接，下面的JS会自动帮你转换成openapp协议
-                "url": "https://u.jd.com/JrIR3mU",
-                "command": "14:/热门促销会场！⇴Jīιng□崬！T6JVPFjxi4d2LiM3！ MF3390 " 
-            },
-            { "url": "https://u.jd.com/JDISNWk", "title": "JD 购物 每天领红包" },
-        ]
-    },
-    {
-        "site": "美团",
-        "color": "#ffba1e",
-        "icon": "https://www.meituan.com/favicon.ico",
-        "acivity": [
-            { 
-                "url": "https://mt.a1test.com/a1", 
-                "title": "美团外卖红包"
-            }
-        ]
-    },
-    {
-        "site": "淘宝",
-        "color": "#ff6a00",
-        "icon": "https://www.taobao.com/favicon.ico",
-        "acivity": [
-            { 
-                "url": "https://m.taobao.com", 
-                "title": "淘宝首页"
-            }
-        ]
-    },
-    {
-        "site": "抖音",
-        "color": "#1c1e21",
-        "icon": "https://www.douyin.com/favicon.ico",
-        "acivity": [
-            { "title": "抖音商城", "url": "https://www.douyin.com"}
-        ]
-    }
-];
+<div class="image-viewer" id="imageViewer" onclick="closeImageViewer()">
+    <img src="" id="bigImage">
+    <div class="close-hint">点击任意处关闭</div>
+</div>
 
+<script>
+// 获取 DOM 元素
 const topNav = document.getElementById('topNav');
 const content = document.getElementById('content');
+const imageViewer = document.getElementById('imageViewer');
+const bigImage = document.getElementById('bigImage');
 
-function init() {
+// 页面加载完成后开始 Fetch 数据
+document.addEventListener('DOMContentLoaded', () => {
+    // ⚠️ 注意：这里必须使用 http/https 协议访问（Live Server），file:// 协议会报错
+    fetch('json/infoList.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('网络响应错误: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            init(data); // 数据加载成功后，初始化页面
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            content.innerHTML = `<div style="text-align:center;padding:20px;color:#999;">
+                加载数据失败，请确保使用 Live Server 打开。<br>
+                错误信息: ${error.message}
+            </div>`;
+        });
+});
+
+// 初始化函数改为接收 data 参数
+function init(infoList) {
     infoList.forEach((site, index) => {
         renderNav(site, index);
         renderSection(site, index);
@@ -353,7 +401,6 @@ function init() {
     initScrollSpy();
 }
 
-// 渲染导航 (保持不变)
 function renderNav(site, index) {
     const navItem = document.createElement('a');
     navItem.className = 'nav-item';
@@ -385,7 +432,6 @@ function renderNav(site, index) {
     topNav.appendChild(navItem);
 }
 
-// 渲染内容区
 function renderSection(site, index) {
     const section = document.createElement('div');
     section.className = 'site-section';
@@ -401,7 +447,6 @@ function renderSection(site, index) {
         const hasUrl = act.url && act.url.trim() !== "";
         let btnHtml = '';
         if (hasUrl) {
-            // 我们把 site 名称也传进去，方便在 handleGoClick 里做判断
             btnHtml = `<a href="javascript:;" 
                           data-url="${act.url}" 
                           data-scheme="${act.scheme || ''}"
@@ -412,6 +457,7 @@ function renderSection(site, index) {
 
         const textTag = (act.text && act.text.trim()) ? `<div class="text-content">${act.text}</div>` : '';
 
+        // 口令模块
         let commandTag = '';
         if (act.command && act.command.trim()) {
             commandTag = `
@@ -421,17 +467,24 @@ function renderSection(site, index) {
                          data-code="${encodeURIComponent(act.command)}" 
                          data-site="${site.site}"
                          onclick="handleCopyClick(event, this)">
-                        复制
+                        复制到 APP
                     </div>
                 </div>
             `;
         }
         
+        // 图片模块
         let photoTag = '';
-        if (act.photos && act.photos.trim()) {
+        if (act.smallPhoto && Array.isArray(act.smallPhoto) && act.smallPhoto.length > 0) {
+            const imgs = act.smallPhoto.map(src => {
+                return `<img src="${src}" class="small-photo-item" onclick="openImageViewer(event, this.src)">`;
+            }).join('');
+            photoTag = `<div class="small-photo-box">${imgs}</div>`;
+        } 
+        else if (act.photos && act.photos.trim()) {
             const photoList = act.photos.split(',');
             photoTag = `<div class="photo-grid">
-                ${photoList.map(p => `<img src="${p.trim()}" onerror="this.style.backgroundColor='#eee';this.alt='img'">`).join('')}
+                ${photoList.map(p => `<img src="${p.trim()}" onclick="openImageViewer(event, this.src)">`).join('')}
             </div>`;
         }
 
@@ -458,57 +511,63 @@ function renderSection(site, index) {
     content.appendChild(section);
 }
 
-// === 核心逻辑修改：自动生成跳转协议 ===
+// 大图查看器
+function openImageViewer(e, src) {
+    e.stopPropagation(); 
+    bigImage.src = src;
+    imageViewer.style.display = 'flex';
+    requestAnimationFrame(() => {
+        imageViewer.classList.add('active');
+    });
+    document.body.style.overflow = 'hidden';
+}
+
+function closeImageViewer() {
+    imageViewer.classList.remove('active');
+    setTimeout(() => {
+        imageViewer.style.display = 'none';
+        bigImage.src = '';
+    }, 300); 
+    document.body.style.overflow = '';
+}
+
+// 跳转逻辑
 function handleGoClick(event, element) {
     event.preventDefault();
     event.stopPropagation();
 
     const url = element.dataset.url;
-    let scheme = element.dataset.scheme; // 如果JSON里手动配了，优先用手动配的
+    let scheme = element.dataset.scheme;
     const site = element.dataset.site;
 
-    // 如果没有手动配置 scheme，我们根据站点自动生成
     if (!scheme) {
         if (site === '京东' || url.includes('jd.com')) {
-            // 【京东 核心修复】
-            // 必须对 params 内部的 JSON 进行 encodeURIComponent
-            // des: 'm' 表示打开内置M页
-            const params = {
-                category: 'jump',
-                des: 'm',
-                url: url
-            };
+            const params = { category: 'jump', des: 'm', url: url };
             scheme = `openapp.jdmobile://virtual?params=${encodeURIComponent(JSON.stringify(params))}`;
         } 
-        else if (site === '淘宝' || url.includes('taobao.com') || url.includes('tmall.com')) {
-            // 淘宝: 去掉 https:// 头部
+        else if (site === '淘宝' || url.includes('taobao.com')) {
             const cleanUrl = url.replace(/^https?:\/\//, '');
             scheme = `taobao://${cleanUrl}`;
         }
         else if (site === '美团' || url.includes('meituan.com')) {
-            // 美团
             scheme = `imeituan://www.meituan.com/web?url=${encodeURIComponent(url)}`;
         }
     }
 
-    // 执行跳转逻辑
     if (scheme) {
         const startTime = Date.now();
         window.location.href = scheme;
-
-        // 兜底：如果2.2秒后还在当前页面（说明没唤起成功），跳转网页
         setTimeout(function() {
             if (Date.now() - startTime < 2200) {
                  window.location.href = url;
             }
         }, 2000);
     } else {
-        // 没有匹配到协议，直接打开网页
         window.location.href = url;
     }
 }
 
-// 复制逻辑 (保持不变)
+// 复制逻辑
 function handleCopyClick(event, element) {
     event.preventDefault();
     event.stopPropagation();
@@ -581,7 +640,7 @@ function initScrollSpy() {
     sections.forEach(section => observer.observe(section));
 }
 
-init();
+// 注意：init() 函数现在在 fetch 的回调中调用
 </script>
 
 </body>
