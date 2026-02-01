@@ -3,12 +3,11 @@
 		"icon": "https://www.jd.com/favicon.ico",
 		"color": "#FF0F23",
 		"acivity": [{
-				"title": "百亿餐补 大额神券 每天领取",
-				"text": "瑞幸咖啡 9.9 两杯！",
+				"title": "大额无门槛！神券！  每天领取（20-12，15-10）",
+				"text": "瑞幸咖啡 9.9 两杯！,蜜雪冰城 4.9 两杯 ！",
 				"url": "https://u.jd.com/JrIR3mU",
 				"command": "14:/热门促销会场！⇴Jīιng□崬！T6JVPFjxi4d2LiM3！ MF3390 ",
 				"smallPhoto": [
-					"static/img1.jpg",
 					"static/img1.jpg"
 				]
 			},
@@ -20,7 +19,7 @@
 			},
 
 			{
-				"url": "https://u.jd.com/Jauphjy",
+				"url": "https://u.jd.com/JrEtJXQ",
 				"title": "京东外卖满8减7 限时抢"
 			},
 
@@ -31,6 +30,26 @@
 			}
 		]
 	},
+
+
+	{
+		"site": "淘宝闪购",
+		"color": "#409eff",
+		"icon": "https://www.taobao.com/favicon.ico",
+		"acivity": [
+			{
+				"url": "https://market.m.taobao.com/app/starlink/wakeup-transit/pages/download?star_id=8339&slk_force_set_request=true&tfPos=h5&alsc_exsrc=ES0007076172&scene=18d5da8b48ca4e4cb01fdfe943416135",
+				"title": "每天领取闪购大额满减红包"
+			},
+			{
+				"url":"https://market.m.taobao.com/app/starlink/wakeup-transit/pages/download?star_id=9249&slk_force_set_request=true&scene=6ba95882d41a4251a9863b192a5f74c6",
+				"title":"闪购平台红包，外卖+超市"
+			}
+
+		]
+	},
+	
+	
 	{
 		"site": "美团",
 		"color": "#ffba1e",
@@ -43,23 +62,6 @@
 			{
 				"title": "美团外卖品质商家红包",
 				"url": "http://dpurl.cn/LGSqTEdz"
-			}
-		]
-	},
-
-	{
-		"site": "淘宝闪购",
-		"color": "#409eff",
-		"icon": "https://www.taobao.com/favicon.ico",
-		"acivity": [{
-				"title": "淘宝闪购1",
-				"url": "",
-				"text": "淘宝闪购输入99999"
-			},
-			{
-				"url": "https://u.ele.me/UNTe13Hj",
-				"title": "淘宝闪购 饿了么天天领红包",
-				"command": "0復制此段2:/＄U68s5OM＄~.淘宝闪购App【打开淘宝闪购APP扫红包】"
 			}
 		]
 	},
