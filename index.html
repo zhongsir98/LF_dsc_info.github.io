@@ -504,7 +504,7 @@ function renderSection(site, index) {
     section.innerHTML = `
         <div class="site-header">
             <span class="badge">${site.site}</span>
-            <span class="site-title">精选内容</span>
+            <span class="site-title">叠加优惠活动 更划算</span>
         </div>
         ${activityHtml}
     `;
@@ -532,6 +532,7 @@ function closeImageViewer() {
 }
 
 // 跳转逻辑
+// === 修改后的跳转逻辑：只唤起APP，不跳转网页 ===
 function handleGoClick(event, element) {
     event.preventDefault();
     event.stopPropagation();
@@ -540,12 +541,13 @@ function handleGoClick(event, element) {
     let scheme = element.dataset.scheme;
     const site = element.dataset.site;
 
+    // 1. 自动生成协议头的逻辑（保持不变）
     if (!scheme) {
         if (site === '京东' || url.includes('jd.com')) {
             const params = { category: 'jump', des: 'm', url: url };
             scheme = `openapp.jdmobile://virtual?params=${encodeURIComponent(JSON.stringify(params))}`;
         } 
-        else if (site === '淘宝' || url.includes('taobao.com')) {
+        else if (site === '淘宝' || url.includes('taobao.com') || url.includes('tmall.com')) {
             const cleanUrl = url.replace(/^https?:\/\//, '');
             scheme = `taobao://${cleanUrl}`;
         }
@@ -554,19 +556,22 @@ function handleGoClick(event, element) {
         }
     }
 
+    // 2. 执行跳转
     if (scheme) {
-        const startTime = Date.now();
+        // === 核心修改点 ===
+        // 直接尝试打开 APP 协议
         window.location.href = scheme;
-        setTimeout(function() {
-            if (Date.now() - startTime < 2200) {
-                 window.location.href = url;
-            }
-        }, 2000);
+        
+        // 提示用户正在尝试打开
+        showToast("正在唤起 APP...");
+
+        // ❌ 我们删除了之前的 setTimeout 兜底逻辑
+        // 这样如果没有安装 APP，页面也不会乱跳，而是停留在当前页
     } else {
+        // 如果根本没有生成 scheme (比如普通网站)，则保持原样跳转网页，否则按钮就坏了
         window.location.href = url;
     }
 }
-
 // 复制逻辑
 function handleCopyClick(event, element) {
     event.preventDefault();
