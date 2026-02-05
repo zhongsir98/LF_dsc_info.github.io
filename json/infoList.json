@@ -19,11 +19,6 @@
 			},
 
 			{
-				"url": "https://u.jd.com/JrEtJXQ",
-				"title": "京东外卖满8减7 限时抢"
-			},
-
-			{
 				"url": "https://u.jd.com/JDISNWk",
 				"title": "JD 购物 每天领红包  年货节",
 				"text": "每天可领取 3 次"
@@ -38,16 +33,18 @@
 		"icon": "https://www.taobao.com/favicon.ico",
 		"acivity": [
 			{
-				"url": "https://market.m.taobao.com/app/starlink/wakeup-transit/pages/download?star_id=8339&slk_force_set_request=true&tfPos=h5&alsc_exsrc=ES0007076172&scene=18d5da8b48ca4e4cb01fdfe943416135",
-				"title": "每天领取闪购大额满减红包"
-			},
-			{
 				"url":"https://market.m.taobao.com/app/starlink/wakeup-transit/pages/download?star_id=9249&slk_force_set_request=true&scene=6ba95882d41a4251a9863b192a5f74c6",
 				"title":"闪购平台红包，外卖+超市"
 			},
 			{
+				"url": "https://market.m.taobao.com/app/starlink/wakeup-transit/pages/download?star_id=8339&slk_force_set_request=true&tfPos=h5&alsc_exsrc=ES0007076172&scene=18d5da8b48ca4e4cb01fdfe943416135",
+				"title": "每天领取闪购大额满减红包"
+			},
+
+			{
 				"url":"https://market.m.taobao.com/app/starlink/wakeup-transit/pages/download?star_id=8706&slk_force_set_request=true&alsc_exsrc=ES0007485972&scene=f4d3f4ee85f04b208fb9503b39fdc9fc",
-				"title":"每晚8点，抢宵夜红包"
+				"title":"每晚8点，抢宵夜红包",
+				"text": "领取红包后留通过该隐藏入口下单会更加便宜，通过店铺右侧 \"领取下单\""
 			}
 
 		]
@@ -60,8 +57,14 @@
 		"icon": "https://www.meituan.com/favicon.ico",
 		"acivity": [{
 				"title": "美团外卖红包天天领",
-				"url": "http://dpurl.cn/XG0jFnQz",
-				"command":"1 %复制信息#% 打开团App http:/¥7sOTMzYWMzZDY¥一起领"
+				"url": "http://dpurl.cn/64gXczAz",
+				"command":"1 %复制信息#% 打开团App http:/¥t2Y2UzNGJhM2Y¥一起领"
+			},
+			
+			{
+				"title": "美团闪购超市",
+				"url": "http://dpurl.cn/GKOynEdz",
+				"text":"超市便利，酒水零食日用品"
 			},
 			{
 				"title": "美团外卖品质商家红包",
